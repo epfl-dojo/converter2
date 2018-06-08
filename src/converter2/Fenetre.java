@@ -8,8 +8,10 @@ package converter2;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 import javax.swing.*;
 import javax.swing.border.Border;
+
 
 /**
  *
@@ -17,6 +19,7 @@ import javax.swing.border.Border;
  */
 public class Fenetre extends JFrame {
     
+    private double taux = getTaux();
     private JPanel container = new JPanel();
     private JPanel panel_SUP = new JPanel();
     private JPanel panel_INF = new JPanel();
@@ -26,10 +29,10 @@ public class Fenetre extends JFrame {
     private JRadioButton rb_EURO2CHF = new JRadioButton("EURO => CHF");
     private JLabel lbl_CHF = new JLabel("CHF ");
     private JLabel lbl_EURO = new JLabel(" EURO");
-    private JButton btn_Convert = new JButton("Convert");
-    private JButton btn_Reset = new JButton("Reset");
+    private Bouton btn_Convert = new Bouton("Convert", Color.BLUE, Color.WHITE, new Font("Verdana", Font.BOLD, 10) );
+    private Bouton btn_Reset = new Bouton("Reset", Color.BLACK, Color.WHITE, new Font("Verdana", Font.BOLD, 10) );
     private ButtonGroup btngrp = new ButtonGroup();
-    
+   
     public Fenetre() {
         this.setTitle("Converter"); // Titre de la fenêtre
         this.setSize(450, 120); // Taille de la fenêtre en (x,y)
@@ -71,10 +74,17 @@ public class Fenetre extends JFrame {
         panel_INF.add(Box.createRigidArea(new Dimension(5, 0)));
         panel_INF.add(btn_Reset);
         btn_Convert.addActionListener(new Clickconvert());
+        btn_Reset.addActionListener(new ClickReset());
         container.add(panel_INF, BorderLayout.SOUTH);
 
         this.setVisible(true);
 
+    }
+    
+    public double getTaux() {
+        // @TODO: get the TAUX from the web
+        //JSONObject json = new JSONObject(IOUtils.toString(new URL("http://data.fixer.io/api/latest?access_key=9e978e3268e89b820d0f577c31a7049b&base=EUR&symbols=CHF"), Charset.forName("UTF-8")));
+        return 1.2;
     }
 
     // ***
@@ -82,9 +92,28 @@ public class Fenetre extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            if(rb_CHF2EURO.isSelected()) {
+                double CHF = Double.parseDouble(txt_CHF.getText())*(1/taux);
+                txt_EURO.setText(new DecimalFormat("##.##").format(CHF));
+                
+            } else {
+                double EURO = Double.parseDouble(txt_EURO.getText())*taux;
+                txt_CHF.setText(new DecimalFormat("##.##").format(EURO));
+
+            }
         }
 
+    }
+    
+    class ClickReset implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            txt_CHF.setText("");
+            txt_EURO.setText("");
+            rb_CHF2EURO.setSelected(false);
+            rb_EURO2CHF.setSelected(false);
+        }
     }
     
     class CHFListener implements ActionListener {
